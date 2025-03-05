@@ -1,0 +1,46 @@
+Bro for exp 5 this one is shorter code---
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#define MAX 10
+
+char prod[MAX][MAX]; int n;
+
+void first(char c, char firstSet[MAX]) {
+    if (!isupper(c)) { strncat(firstSet, &c, 1); return; }
+    for (int i = 0; i < n; i++)
+        if (prod[i][0] == c)
+            for (int j = 2; prod[i][j] != '\0'; j++) {
+                first(prod[i][j], firstSet);
+                if (strchr(firstSet, 'e') == NULL) break;
+            }
+}
+
+void follow(char c, char followSet[MAX]) {
+    if (prod[0][0] == c) strncat(followSet, "$", 1);
+    for (int i = 0; i < n; i++)
+        for (int j = 2; prod[i][j] != '\0'; j++)
+            if (prod[i][j] == c) {
+                if (prod[i][j + 1] != '\0')
+                    first(prod[i][j + 1], followSet);
+                else if (prod[i][j + 1] == '\0' && c != prod[i][0])
+                    follow(prod[i][0], followSet);
+            }
+}
+
+void parseTable() {
+    char firstSet[MAX], followSet[MAX];
+    for (int i = 0; i < n; i++) {
+        memset(firstSet, 0, MAX); first(prod[i][2], firstSet);
+        memset(followSet, 0, MAX); follow(prod[i][0], followSet);
+        printf("%c -> %s | FIRST: %s | FOLLOW: %s\n", prod[i][0], &prod[i][2], firstSet, followSet);
+    }
+}
+
+int main() {
+    printf("Enter number of productions: "); scanf("%d", &n);
+    printf("Enter productions (e.g., A=aB):\n");
+    for (int i = 0; i < n; i++) scanf("%s", prod[i]);
+    parseTable();
+    return 0;
+}
